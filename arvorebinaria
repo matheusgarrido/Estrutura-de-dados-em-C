@@ -1,0 +1,273 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <locale.h>
+
+//Programado por Matheus Garrido em 2017
+
+//Estrutura para armazenar os dados de uma árvore binária
+struct arvore{
+	//Informação que será armazenada no "galho"
+	int info;
+	//Informa se é o primeiro, segundo, terceiro "nível do galho"
+	int niv;
+	//Ponteiro do "galho" seguinte à esquerda
+	struct arvore* esq;
+	//Ponteiro do "galho" seguinte à direita
+	struct arvore* dir;
+};
+
+//Criação do tipo Arv, usado para armazenar na estrutura "arvore"
+typedef struct arvore Arv;
+
+//Declaração das funções para permitir o método principal, o "main", fique próximo ao início do documento
+Arv* criarArvore();
+Arv* inserirArvore(Arv* a);
+Arv* primeiroValor(Arv* a);
+Arv* buscar(Arv* a, int b);
+int quantidade(Arv* a, int b);
+void imprimir(Arv* a);
+
+//Variavel para modificar o estado na recursividade da busca
+int ok;
+//Quantidade de elementos com o mesmo valor
+int qtd;
+//Nível hierarquico das repetições
+int nh[50], cont;
+
+void main(int argc, char *argv[]) {
+	setlocale(LC_ALL, "portuguese");
+	//Criando ponteiros para criar a lista (árvore)
+	Arv* a = NULL;
+	Arv* aux = NULL;
+	int op;
+	do {		
+		printf("\t\tMENU\n");
+		printf("1 - Inserir / atualizar valor\n");
+		printf("2 - Buscar valor\n");
+		printf("3 - Listar árvore\n");
+		printf("0 - Sair\n");
+		
+		printf("\nOpção: ");
+		scanf("%d", &op);
+		int b;
+		switch(op){
+			case 1:
+				if (a == NULL) a = primeiroValor(a);
+				else aux = inserirArvore(a);
+				break;
+			case 2:
+				ok = 0, qtd = 0;
+				printf("Valor de busca: ");
+				scanf("%d", &b);				
+				//Busca se há algo salvo e imprime-o
+				buscar(a, b);				
+				if (ok==0) printf("Valor não encontrado.");
+				else{
+					int i;
+					for (i=0; i<50; i++) nh[i] = -1;
+					cont=0;
+					//Contar as repetições do valor
+					quantidade(a, b);					
+					if (qtd==2) printf(" (Há outro valor igual salvo na árvore)");
+					else if (qtd>=3) printf(" (Há outros valores iguais salvos na árvore)");
+					printf("\nQuantidade de elementos: %d\n", qtd);
+					printf("Níveis hierárquicos: ");
+					cont=0;
+					while (nh[cont]>=0){
+						printf("%d ", nh[cont++]);						
+					}
+					printf("\n");
+				}
+				system("pause");
+				break;
+			case 3:
+				if (a==NULL) printf("A árvore está vazia.\n");
+				else imprimir(a);
+				printf("\n");
+				system("pause");
+				break;
+			case 0:
+				printf("Programa finalizado.\n");
+				exit(0);
+				break;
+			default:
+				printf("Opção inválida.\n");
+				system("pause");
+		}
+		system("cls");
+	} while (op!=0);	
+}
+
+/* Implementação de códigos às funções criadas no início do programa
+Função para a criação de espaço na árvore para novos elementos */
+Arv* criarArvore(){	
+	Arv* novo = (Arv*) malloc(sizeof(Arv));
+	novo->info = 0;
+	novo->niv = 0;
+	novo->esq = NULL;
+	novo->dir = NULL;
+	return novo;
+}
+
+/* Criação do nó-raiz
+O nó-raiz (primeiro nó) possui o valor 0 em seu nível */
+Arv* primeiroValor(Arv* a){	
+	a = criarArvore();
+	printf("Valor: ");
+	int x;
+	scanf("%d", &x);
+	a->info = x;
+	a->niv = 0;
+	return a;
+}
+
+// Inserção de valores na lista (árvore)
+Arv* inserirArvore(Arv* a){
+	int op;	
+	//Menu exibido caso já exista o nó-raiz
+	if (a!=NULL) {
+		printf("\t\tMENU\n");
+		printf("Valor atual: %d (nível %d)\n", a->info, a->niv);
+		
+		//Opções padrões seguidas e mensagens que serão exibidas caso o "galho" já esteja ocupado
+		printf("1 - Inserir à esquerda");
+		if (a->esq!=NULL) printf(" (há valor salvo nesta posição)");
+		printf("\n2 - Inserir à direita");
+		if (a->dir!=NULL) printf(" (há valor salvo nesta posição)");
+		
+		//Opções adicionais caso o "galho" já esteja ocupado
+		if (a->esq!= NULL && a->dir!=NULL){
+			printf("\n3 - Avançar à esquerda");
+			printf("\n4 - Avançar à direita");
+			do{	
+				printf("\n\nOpção: ");
+				scanf("%d", &op);
+				if (op>4 || op<1) printf("Opção inválida.");
+			} while(op>4 || op<1);			
+		}
+		else if (a->esq!=NULL){
+			printf("\n3 - Avançar à esquerda");
+			do{	
+				printf("\n\nOpção: ");
+				scanf("%d", &op);
+				if (op!=1&&op!=2&&op!=3) printf("Opção inválida.");
+			} while(op!=1&&op!=2&&op!=3);
+		}
+		else if (a->dir!=NULL){
+			printf("\n4 - Avançar à direita");
+			do{	
+				printf("\n\nOpção: ");
+				scanf("%d", &op);
+				if (op!=1&&op!=2&&op!=4) printf("Opção inválida.");
+			} while(op!=1&&op!=2&&op!=4);
+		}
+		else{
+			do{	
+				printf("\n\nOpção: ");
+				scanf("%d", &op);
+				if (op>2 || op<1) printf("Opção inválida.");
+			} while(op>2 || op<1);
+		}
+	}
+	int x;
+	switch (op){
+		case 1:
+			//Inserção no "galho" à esquerda
+			printf("Valor: ");
+			scanf("%d", &x);			
+			if (a->esq==NULL){
+				a->esq = criarArvore();
+				printf("Valor inserido.\n\n", x);
+			}
+			else printf("Valor atualizado.\n\n", a->esq->info, x);
+			a->esq->info = x;
+			a->esq->niv = a->niv + 1;
+			a->esq->esq = NULL;
+			a->esq->dir = NULL;
+			system("pause");
+			system("cls");
+			break;
+		case 2:
+			//Inserção no "galho" à direita
+			printf("Valor: ");
+			scanf("%d", &x);
+			//Caso seja a primeira inserção de dados
+			if (a->dir==NULL){
+				a->dir = criarArvore();
+				printf("Valor inserido.\n", x);
+			}
+			//Caso já tenha dados salvos anteriormente neste "galho"
+			else printf("Valor atualizado.\n", a->dir->info, x);
+			a->dir->info = x;
+			a->dir->niv = a->niv + 1;
+			a->dir->esq = NULL;
+			a->dir->dir = NULL;
+			system("pause");
+			system("cls");
+			break;
+		case 3:
+			//Avança para o "galho" à esquerda e repete todo o procedimento de inserção
+			inserirArvore(a->esq);
+			break;
+		case 4:
+			//Avança para o "galho" à direita e repete todo o procedimento de inserção
+			inserirArvore(a->dir);
+			break;
+		default:
+			//Mensagem para um valor de entrada no menu inválido
+			printf("Opção inválida.\n");
+			inserirArvore(a);
+	}
+	return a;
+}
+
+//Função para buscar um número na árvore toda
+Arv* buscar(Arv* a, int b){
+	//Caso não tenha nenhum valor inserido
+	if (a==NULL) return a;
+	/*Impressão da localização do valor na árvore 
+	A impressão se inicia no nó-raiz e termina no valor buscado
+	Caso haja outros valores, será exibido o primeiro encontrado */
+	if (b==a->info) {
+		ok=1;
+		printf("Nó raiz: ");
+	}
+	if (ok==0) buscar(a->esq, b) || buscar(a->dir, b);
+	if (ok==1){
+		printf("%d", a->info);
+		if (a->niv!=0) printf(" -> ");
+	}
+}
+
+//Função para calcular a quantidade de "galhos" com o mesmo valor salvo
+int quantidade(Arv* a, int b){
+	if (a==NULL) return 0;
+	if (b==a->info) {
+		qtd++;
+		nh[cont] = a->niv;
+		cont++;
+	}
+	quantidade(a->esq, b);
+	quantidade(a->dir, b);
+	if (a->niv==0) return qtd;
+}
+
+//Função para imprimir toda a árvore
+void imprimir(Arv* a){
+	if (a!=NULL){
+		printf("%d / ", a->info);
+		imprimir(a->esq);
+		printf(" \\ ");
+		imprimir(a->dir);
+	}	
+}
+/* Exemplo de impressão: " 5 / 10 / 7 / \ \ 9 / \ \ 4 / \ 2 / \ "
+A lista acima seria referente à:
+                    5
+                /      \
+            10            4
+         /     \       /     \
+      7         9    NULL     2
+   /    \     /   \         /    \	
+ NULL  NULL NULL NULL     NULL  NULL
+*/
