@@ -9,6 +9,6 @@ Contato via LinkedIn: https://www.linkedin.com/in/matheusgarrido10/
 
 DEFINIÇÕES
 1. Árvore Binária: Estrutura de Dados que se inicia com um nó-raiz que aponta para 2 "ramificações" inicialmente vazias.
-Como exemplo, pode ser utilizado uma árvore genealógica, partindo de um indivíduo e se ramificando pelos pais, avós, bisavós.
+Como exemplo, uma árvore genealógica, que parte de um indivíduo e se ramifica pelos pais, avós, bisavós.
 
 2. Fila: Estrutura de Dados do tipo FIFO (first in, first out), onde um valor é inserido ao fim de uma lista e o próximo a ser removido está no início.
