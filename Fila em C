@@ -1,0 +1,152 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <locale.h>
+
+//Programado por Matheus Garrido em 2017
+
+// Fila com capacidade de armazenamento de até 200 números
+#define TAMANHO 200
+
+//Declaração das funções para permitir o método principal, o "main", fique próximo ao início do documento
+typedef struct fila Fila;
+Fila* criar();
+void inserir (Fila* f);
+float remover(Fila* f, int pos);
+int buscar(Fila* f, int b);
+void listar(Fila* f);
+
+//Estrutura para armazenar os dados de uma fila
+struct fila {
+	//Quantidade de valores armazenadas na fila
+	int n;
+	//Informação que será armazenada [posição da informação, até 200 números]
+	float x[TAMANHO];
+};
+
+void main(int argc, char *argv[]) {
+	setlocale(LC_ALL, "portuguese");
+	//Criando a fila
+	Fila* f = criar();
+	while(1==1){
+		// Menu principal
+		printf("1 - Inserir\n2 - Buscar\n3 - Buscar e remover\n4 - Listar\n5 - Sair\n");
+		int op, lb;
+		float b;
+		// Interação com o menu
+		printf("\nOpção: ");
+		scanf("%d", &op);
+		switch(op){
+			case 1:
+				//Inserção de dados na fila
+				inserir(f);
+				break;
+			case 2:
+				// Busca de uma informação na fila
+				printf("Valor de busca: ");
+				scanf("%f", &b);
+				buscar(f, b);
+				break;
+			case 3:
+				// Busca de uma informação na fila para deletar
+				printf("Valor de busca: ");
+				scanf("%f", &b);
+				// A busca retorna a posição do valor
+				lb = buscar(f, b);
+				// Caso o valor esteja na fila (0-199 == 1º-200º), será excluído
+				if (lb >= 0) {
+					f->x[0] = remover(f, lb);
+					if (f->n != 0){
+						printf("Valor excluído.\n");
+					} 
+					listar(f);
+				}
+				break;
+			case 4:
+				//Função para imprimir toda a fila
+				listar(f);
+				break;
+			case 5:
+				//Fim do programa
+				printf("Programa finalizado.\n");
+				exit(0);
+			default:
+				printf("Opção inválida.\n");				
+		}
+		system("pause");
+		system("cls");
+	}
+}
+
+/* Implementação de códigos às funções criadas no início do programa
+Função para a criação da estrutura da fila */
+Fila* criar(){
+	Fila* f = (Fila*) malloc(sizeof(Fila));
+	f->n = 0;	
+	return f;
+}
+
+// Inserção de valores na fila
+void inserir (Fila* f){
+	// Verificação de quantidade de dados armazenados
+	if (f->n == TAMANHO) {
+		printf("Capacidade da fila estourou.\n");
+		return;
+	}
+	// Inserção
+	printf("Valor: ");
+	scanf("%f", &f->x[f->n]);
+	f->n++;
+	printf("Valor inserido.\n");
+}
+
+// Remoção de valores na fila
+float remover(Fila* f, int pos){
+	// Verificação de quantidade de dados armazenados
+	if (f->n==0) {
+		printf("Fila vazia.\n");
+		return f->x[0];
+	}
+	// Remoção
+	int i;
+	for (i=pos; i<f->n; i++){
+		f->x[i] = f->x[i+1];
+	}
+	f->x[i+1] = 0;
+	f->n--;
+	return f->x[0];
+}
+
+// Busca de uma primeiro aparição de um valor especificado na fila
+int buscar(Fila* f, int b){	
+	int i;
+	// Verificação de quantidade de dados armazenados
+	if (f->n==0){
+		printf("Fila vazia.\n");
+		return -1;
+	}
+	// Busca pelo valor
+	for (i=0; i < f->n; i++){
+		if (b == f->x[i]){
+			printf("Posição: %dº\n", (i+1));
+			return i;
+		}
+	}
+	// Resposta negativa na busca
+	printf("Valor não encontrado.\n");
+	return -1;
+}
+
+//Função para imprimir toda a fila
+void listar(Fila* f){
+	// Verificação de quantidade de dados armazenados
+	if (f->n==0){
+		printf("Fila vazia.\n");
+		return;
+	}
+	// Impressão de valores e suas posições
+	int i;
+	printf("Fila:\n");
+	for (i=0; i < f->n; i++){
+		printf("%dº: %.0f\n", (i+1), f->x[i]);
+	}
+}
