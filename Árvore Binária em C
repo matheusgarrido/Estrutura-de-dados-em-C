@@ -1,3 +1,5 @@
+/* Definições deste código inseridas no READ ME */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
